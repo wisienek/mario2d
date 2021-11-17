@@ -1,6 +1,10 @@
 #pragma once
 
+#include <SFML/Graphics.hpp>
+#include <list>
+
 #include "Object.h"
+#include "Animation.h"
 
 using namespace sf;
 
@@ -10,19 +14,11 @@ class Mario : public Object
 private:
 	// sprite config
 	Sprite shape;
-	Texture texture;
+	Texture playerTexture;
 	// animation textures
 	String textureFile_small_idle = "./resources/graphics/entities/mario-small-stand.png";
-	String textureFile_small_run = "./resources/graphics/entities/mario-small-run.png";
-	String textureFile_small_walk_0 = "./resources/graphics/entities/mario-small-walk-0.png";
-	String textureFile_small_walk_1 = "./resources/graphics/entities/mario-small-walk-1.png";
-	String textureFile_small_walk_2 = "./resources/graphics/entities/mario-small-walk-2.png";
-	String textureFile_small_jump = "./resources/graphics/entities/mario-small-jump.png";
-	String textureFile_small_fall = "./resources/graphics/entities/mario-small-fall.png";
-	String textureFile_small_hang_0 = "./resources/graphics/entities/mario-small-hang-0.png";
-	String textureFile_small_hang_1 = "./resources/graphics/entities/mario-small-hang-1.png";
+	Animation* animation;
 
-	Vector2f prevPos{0, 0};
 	// small mario 16x16px
 	const short int small_width{ 16 };
 	const short int small_height{ 16 };
@@ -32,31 +28,36 @@ private:
 	// current size
 	short int width{ small_height };
 	short int height{ small_height };
-	float boundsW;
-	float boundsH;
+	int boundsW;
+	int boundsH;
 
 	// class config
 	bool isBig = false;
-	bool canFire = false;
 	bool isBouncing = false;
-	bool isRunning = false;
 	bool isCrouching = false;
+	bool isMoving = false;
+	bool canFire = false;
 	bool canCollide = true;
 	
+	// game system
 	short int hearts = 3;
+	long points = 0;
+
 	// movement
+	Vector2f prevPos{ 0, 0 };
 	const float playerVelocity{ 1.3f };
 	// -1 <- down, 0 <- standing, 1 <- up
 	short int jumping{ 0 };
 	short int jumpingDuration{ 60 };
 	short int jumpingCounter{ 0 };
-	// -1 <- left, 0 <- standing, 1 <- right
-	short int direction{ 0 };
-	// moving somehere ( can be (0;0) if not moving )
-	Vector2f velocity{ playerVelocity * direction, playerVelocity * jumping };
+	
+	bool facing = true; // Facing: true - right, false - left
 
 	// drawing shape
 	void draw(RenderTarget& target, RenderStates state) const override;
+
+	// references
+	std::vector<Object*>* objects;
 
 	// movement
 	void updateKeyInput();
@@ -74,6 +75,7 @@ public:
 
 	// positions
 	sf::FloatRect bounds();
+	void setObjectsReference(std::vector<Object*>* objects);
 	void move( float x, float y );
 	void setPosition(float x, float y);
 	
@@ -84,9 +86,11 @@ public:
 	void endJumping();
 
 	// collisions
-	void setVideoBounds(float w, float h);
+	void setVideoBounds(const int w, const int h);
 	virtual void resolveColision();
 
+	//functions
+	void fire();
 	virtual void hit(Object *what);
 	virtual void hurt();
 	virtual void die();

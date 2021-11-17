@@ -8,11 +8,13 @@ class Object : public sf::Drawable
 protected:
 	bool walkable;
 	bool collidable;
+	bool collectable;
 public:
 	Object();
 
 	bool isWalkable() { return walkable; };
 	bool isCollidable() { return collidable; };
+	bool isCollectable() { return collectable; };
 
 	virtual std::string name() = 0;
 
