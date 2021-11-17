@@ -20,8 +20,12 @@ private:
 
 	// Entities
 	Mario* player;
-	std::vector<Object> objects;
+	std::vector<Object*> objects;
 
+	Clock clock;
+	float deltaTime{ 0.f };
+
+	// functions
 	void initVars();
 	void initWindow();
 	void initPlayer();
@@ -38,6 +42,7 @@ public:
 	void update();
 	void updateEvents();
 	void updateEntities();
+	void updateTime();
 	void render();
 };
 
