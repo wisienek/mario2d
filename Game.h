@@ -1,8 +1,12 @@
-#pragma once
+#pragma 
+
+#include <vector>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
+
+#include "Mario.h"
 
 
 // game class
@@ -14,8 +18,13 @@ private:
 	sf::VideoMode videoMode;
 	sf::Event event;
 
+	// Entities
+	Mario* player;
+	std::vector<Object> objects;
+
 	void initVars();
 	void initWindow();
+	void initPlayer();
 
 public:
 	// constr/destr
@@ -28,6 +37,7 @@ public:
 	// functions
 	void update();
 	void updateEvents();
+	void updateEntities();
 	void render();
 };
 
