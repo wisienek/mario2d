@@ -12,8 +12,6 @@ using namespace sf;
 class Mario : public Object
 {
 private:
-	// sprite config
-	Sprite shape;
 	Texture playerTexture;
 	// animation textures
 	String textureFile_small_idle = "./resources/graphics/entities/mario-small-stand.png";
@@ -53,11 +51,9 @@ private:
 	
 	bool facing = true; // Facing: true - right, false - left
 
-	// drawing shape
-	void draw(RenderTarget& target, RenderStates state) const override;
-
 	// references
 	std::vector<Object*>* objects;
+	Object* walkingOn;
 
 	// movement
 	void updateKeyInput();
@@ -88,10 +84,12 @@ public:
 	// collisions
 	void setVideoBounds(const int w, const int h);
 	virtual void resolveColision();
+	std::string collisionDirection(Object* colided);
+	bool collisionBelow(Object* test);
 
 	//functions
 	void fire();
-	virtual void hit(Object *what);
+	virtual void hit(Object *what, std::string direction);
 	virtual void hurt();
 	virtual void die();
 

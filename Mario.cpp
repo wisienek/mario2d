@@ -1,14 +1,9 @@
-#include "Mario.h"
 #include <iostream>
 
+#include "Mario.h"
 
 Mario::Mario( float X, float Y ) {
 	init(X, Y);
-}
-
-// const - nie zmienia pól klasy
-void Mario::draw(RenderTarget& target, RenderStates state) const {
-	target.draw( this->shape, state );
 }
 
 void Mario::update() {
@@ -69,7 +64,7 @@ void Mario::init(float X, float Y)
 	this->shape.setTexture(this->playerTexture);
 
 	this->animation = new Animation(&this->playerTexture, Vector2u(3, 1), 0.3f);
-
+	this->walkingOn = 0;
 }
 
 sf::FloatRect Mario::bounds()
@@ -100,10 +95,10 @@ void Mario::jump()
 	if (jumping != 0 || isBouncing) return;
 
 	startJumping();
-	if (jumping == 0) {
-		// play sound
-		// change animation
-	}
+	this->walkingOn = 0;
+
+	// play sound
+	// change animation
 }
 
 void Mario::crouch()
@@ -147,24 +142,51 @@ void Mario::resolveColision()
 		if (!obj->isCollidable()) continue;
 
 		// ignore if not collectable
-		if (!obj->isCollectable()) continue;
+		if (obj->isCollectable()) continue;
 
 		// blocks
-		if (obj->isWalkable() && this->jumping == 1) {
-			this->jumping = -1;
-			obj->hit(this);
+		if (obj->isWalkable()) {
+			std::string direction = this->collisionDirection(obj);
+
+			//if (direction == "" || direction == "TOP") {
+			//	bool isBelowPlayer = collisionBelow(obj);
+			//	if (isBelowPlayer)
+			//		sthBelow = true;
+			//}
+
+			if (direction == "") continue;
+
+			if (direction == "TOP") {
+				if(this->jumping == -1)
+					this->jumping = 0;
+
+				this->walkingOn = obj;
+			}
+
+			if(direction == "BOTTOM" && this->jumping == 1)
+				this->jumping = -1;
+
+			obj->hit(this, direction);
+
+			goBack = true;
 		}
 
+		goBack = true;
 	}
+
+	sf::FloatRect bounds = this->bounds();
+
+	bool withinBounds = !(bounds.left <= 0
+		|| bounds.left + bounds.width >= this->boundsW
+		|| bounds.top <= 0
+		|| bounds.top + bounds.height >= this->boundsH);
 
 	// check for border col
 	if (goBack == false) {
-		sf::FloatRect bounds = this->bounds();
-		if (bounds.left <= 0
-			|| bounds.left + bounds.width >= this->boundsW
-			|| bounds.top <= 0
-			|| bounds.top + bounds.height >= this->boundsH)
+		if (!withinBounds) {
 			goBack = true;
+			this->walkingOn = 0;
+		}
 		// stop falling
 		if (this->jumping == -1 && bounds.top + bounds.height >= this->boundsH)
 			this->jumping = 0;
@@ -172,6 +194,72 @@ void Mario::resolveColision()
 
 	if (goBack)
 		this->shape.setPosition(this->prevPos);
+	else {
+		if (this->walkingOn && !collisionBelow(this->walkingOn)) {
+			this->jumping = -1;
+		}
+	}
+}
+
+std::string Mario::collisionDirection(Object* colided)
+{
+	sf::FloatRect playerBounds = this->bounds();
+	sf::FloatRect colidedBounds = colided->getShape().getGlobalBounds();
+	
+	if (playerBounds.intersects(colidedBounds) == false) return "";
+
+	float p_t = playerBounds.top;
+	float p_b = playerBounds.top + playerBounds.height;
+	float p_l = playerBounds.left;
+	float p_r = playerBounds.left + playerBounds.width;
+	float p_w = playerBounds.width;
+	float p_h = playerBounds.height;
+
+	float o_t = colidedBounds.top;
+	float o_b = colidedBounds.top + colidedBounds.height;
+	float o_l = colidedBounds.left;
+	float o_r = colidedBounds.left + colidedBounds.width;
+	float o_w = colidedBounds.width;
+	float o_h = colidedBounds.height;
+
+	if ((p_b > o_t && p_b < o_b - (o_h/3)) && ((p_l >= o_l && p_l <= o_r) || (p_r <= o_r && p_r >= o_l)) )
+		return "TOP";
+	if ((p_t > o_t && p_t < o_b) && (p_l >= o_l && p_l <= o_r))
+		return "BOTTOM";
+	if ((p_r > o_l && p_r < o_r) && ( (p_b <= o_b && p_b >= o_t) || ( p_t >= o_t && p_t <= o_b ) ))
+		return "LEFT";
+	if ((p_l > o_l && p_l < o_r) && ((p_b <= o_b && p_b >= o_t) || (p_t >= o_t && p_t <= o_b)))
+		return "RIGHT";
+
+	return "";
+}
+
+bool Mario::collisionBelow(Object* test)
+{
+	if (!test) return false;
+
+	sf::FloatRect playerBounds = this->bounds();
+
+	float p_t = playerBounds.top;
+	float p_b = playerBounds.top + playerBounds.height + 2;
+	float p_l = playerBounds.left;
+	float p_r = playerBounds.left + playerBounds.width;
+
+	sf::FloatRect colidedBounds = test->getShape().getGlobalBounds();
+	float o_t = colidedBounds.top;
+	float o_b = colidedBounds.top + colidedBounds.height;
+	float o_l = colidedBounds.left;
+	float o_r = colidedBounds.left + colidedBounds.width;
+
+	bool leftWithin = (p_l >= o_l && p_l <= o_r);
+	bool rightWithin = (p_r >= o_l && p_r <= o_r);
+	bool botWithin = (p_b >= o_t && p_b <= o_b);
+
+	// std::cout << "left: " << leftWithin << ", Right: " << rightWithin << ", bot: " << botWithin << std::endl;
+	if ((leftWithin || rightWithin) && botWithin)
+		return true;
+
+	return false;
 }
 
 void Mario::fire()
@@ -184,7 +272,7 @@ void Mario::fire()
 	}
 }
 
-void Mario::hit(Object * what){}
+void Mario::hit(Object * what, std::string direction){}
 
 void Mario::hurt()
 {
