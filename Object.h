@@ -6,15 +6,21 @@
 class Object : public sf::Drawable
 {
 protected:
+	sf::Sprite shape;
 	bool walkable;
 	bool collidable;
 	bool collectable;
+
+	// drawing shape
+	void draw(sf::RenderTarget& target, sf::RenderStates state) const override;
 public:
 	Object();
 
 	bool isWalkable() { return walkable; };
 	bool isCollidable() { return collidable; };
 	bool isCollectable() { return collectable; };
+
+	sf::Sprite getShape() { return shape; };
 
 	virtual std::string name() = 0;
 
@@ -25,7 +31,7 @@ public:
 	// colisions
 	virtual void resolveColision() = 0;
 
-	virtual void hit(Object *what) = 0;
+	virtual void hit(Object *what, std::string direction) = 0;
 	virtual void hurt() = 0;
 	virtual void die() = 0;
 };
