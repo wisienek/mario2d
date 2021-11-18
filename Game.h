@@ -29,6 +29,7 @@ private:
 	void initVars();
 	void initWindow();
 	void initPlayer();
+	void initBlocks();
 
 public:
 	// constr/destr

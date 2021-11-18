@@ -2,6 +2,8 @@
 #include <iostream>
 
 #include "Mario.h"
+#include "Object.h"
+#include "BorderBlock.h"
 
 // namespace SFML
 using namespace sf;
@@ -14,6 +16,7 @@ Game::Game() {
 	this->initWindow();
 
 	this->initPlayer();
+	this->initBlocks();
 }
 
 Game::~Game() {
@@ -46,6 +49,25 @@ void Game::initPlayer()
 
 	this->player->setVideoBounds(this->videoMode.width, this->videoMode.height);
 	this->player->setObjectsReference(&this->objects);
+}
+
+void Game::initBlocks()
+{
+	BorderBlock *b1 = new BorderBlock();
+	b1->init(this->videoMode.width / 3, this->videoMode.height - 40);
+	this->objects.push_back( dynamic_cast<Object*>(b1) );
+
+	BorderBlock *b2 = new BorderBlock();
+	b2->init(this->videoMode.width / 4, this->videoMode.height - 16);
+	this->objects.push_back(dynamic_cast<Object*>(b2));
+
+	BorderBlock *b3 = new BorderBlock();
+	b3->init(this->videoMode.width / 4 - 16, this->videoMode.height - 16);
+	this->objects.push_back(dynamic_cast<Object*>(b3));
+
+	BorderBlock *b4 = new BorderBlock();
+	b4->init(this->videoMode.width / 4 - 32, this->videoMode.height - 16);
+	this->objects.push_back(dynamic_cast<Object*>(b4));
 }
 
 // game mechanics
@@ -103,6 +125,12 @@ void Game::render()
 
 	this->window->draw(*player);
 
-	// this->window->draw(player);
+	for (auto& i : this->objects) {
+		Object *obj = dynamic_cast<Object*>(i);
+		if (!obj) continue;
+
+		this->window->draw(*obj);
+	}
+
 	this->window->display();
 }
