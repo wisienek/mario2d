@@ -157,6 +157,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Block.cpp" />
+    <ClCompile Include="BorderBlock.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="IEnemy.cpp" />
     <ClCompile Include="Mario.cpp" />
@@ -165,6 +167,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="Block.h" />
+    <ClInclude Include="BorderBlock.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="IEnemy.h" />
     <ClInclude Include="Mario.h" />
