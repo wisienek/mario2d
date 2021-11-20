@@ -17,6 +17,7 @@ public:
 
 	void init(float x=0, float y=0);
 	virtual void hit() {};
+	virtual void animate(float deltaTime) {}
 
 };
 

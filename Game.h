@@ -23,7 +23,6 @@ private:
 	std::vector<Object*> objects;
 
 	Clock clock;
-	float deltaTime{ 0.f };
 
 	// functions
 	void initVars();
@@ -35,6 +34,8 @@ public:
 	// constr/destr
 	Game();
 	virtual ~Game();
+
+	float deltaTime{ 0.f };
 
 	// access
 	const bool isRunning() const;

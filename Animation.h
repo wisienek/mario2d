@@ -8,18 +8,19 @@ class Animation
 {
 private:
 	Vector2u imgCount;
-	Vector2u currentImg;
 
 	float totalTime;
 	float switchTime;
 
 public:
-	sf::IntRect uvRect;
+	Vector2u currentImg;
+
+	IntRect uvRect;
+	int currentRow;
 	
 	Animation(Texture* texture, Vector2u imageCount, float switchTime);
 	~Animation();
 
-	void update(int row, float deltaTime);
-
+	void update(int row, float deltaTime, bool facingRight);
 };
 

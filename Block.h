@@ -20,7 +20,7 @@ public:
 
 	// does nothing
 	virtual void hit(Object *what, std::string direction) {};
-	virtual void animate() {}
+	virtual void animate(float deltaTime) {}
 	virtual void resolveColision() {};
 };
 

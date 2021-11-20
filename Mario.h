@@ -12,22 +12,25 @@ using namespace sf;
 class Mario : public Object
 {
 private:
-	Texture playerTexture;
 	// animation textures
-	String textureFile_small_idle = "./resources/graphics/entities/mario-small-stand.png";
+	// String basetxt = "./resources/graphics/entities/mario-small-stand.png";
+	String textureFile_small_animation = "./resources/graphics/entities/mario-small-animation.png";
+	Texture playerTextureAnimated;
 	Animation* animation;
 
+
+	// fix these !!!!
 	// small mario 16x16px
-	const short int small_width{ 16 };
-	const short int small_height{ 16 };
+	const short unsigned int small_width{ 16 };
+	const short unsigned int small_height{ 16 };
 	// big mario 16x32px
-	const short int big_width{ 16 };
-	const short int big_height{ 32 };
+	const short unsigned int big_width{ 16 };
+	const short unsigned int big_height{ 32 };
 	// current size
-	short int width{ small_height };
-	short int height{ small_height };
-	int boundsW;
-	int boundsH;
+	short unsigned int width{ small_height };
+	short unsigned int height{ small_height };
+	unsigned int boundsW;
+	unsigned int boundsH;
 
 	// class config
 	bool isBig = false;
@@ -56,11 +59,13 @@ private:
 	Object* walkingOn;
 
 	// movement
-	void updateKeyInput();
+	void updateKeyInput(Vector2f *movement);
 	void init(float X, float Y);
 public:
 	// x,y - default position
 	Mario( float X=0, float Y=0 );
+
+	float dt{ 0.f };
 
 	// destructuring
 	Mario() = delete;
@@ -72,13 +77,12 @@ public:
 	// positions
 	sf::FloatRect bounds();
 	void setObjectsReference(std::vector<Object*>* objects);
-	void move( float x, float y );
+	void move(Vector2f *movement);
 	void setPosition(float x, float y);
 	
 	void jump();
 	void crouch();
 	// can be in base class of entity
-	void startJumping(); 
 	void endJumping();
 
 	// collisions
@@ -94,6 +98,6 @@ public:
 	virtual void die();
 
 	//animation
-	virtual void animate();
+	virtual void animate(float deltaTime);
 };
 

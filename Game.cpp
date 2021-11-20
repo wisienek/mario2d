@@ -45,7 +45,7 @@ void Game::initWindow()
 void Game::initPlayer()
 {
 	this->player = new Mario(0.f, 0.f);
-	this->player->setPosition(float(this->videoMode.width / 2), float(this->videoMode.height - this->player->bounds().height - 1));
+	this->player->setPosition(float(this->videoMode.width / 2), float(this->videoMode.height - (this->player->bounds().height/3) - 1));
 
 	this->player->setVideoBounds(this->videoMode.width, this->videoMode.height);
 	this->player->setObjectsReference(&this->objects);
@@ -103,12 +103,15 @@ void Game::updateEvents()
 void Game::updateEntities()
 {
 	this->player->update();
+	this->player->dt = this->deltaTime;
+
 	// auto get upper class
 	for (auto& i : objects) {
 		Object *obj = dynamic_cast<Object*>(i);
 		if (!obj) continue;
 
 		obj->update();
+		obj->animate(this->deltaTime);
 	}
 }
 

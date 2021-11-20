@@ -27,7 +27,7 @@ public:
 	virtual void update() = 0;
 
 	// animation
-	virtual void animate() = 0;
+	virtual void animate(float deltaTime) = 0;
 	// colisions
 	virtual void resolveColision() = 0;
 

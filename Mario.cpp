@@ -7,11 +7,13 @@ Mario::Mario( float X, float Y ) {
 }
 
 void Mario::update() {
-	this->updateKeyInput();
+	sf::Vector2f movement{ 0.f, 0.f };
+	this->updateKeyInput( &movement );
 
 	// if jumping
 	if (jumping == 1) {
-		this->move(0.f, -this->playerVelocity * 1.3f);
+		this->isMoving = true;
+		movement.y = -this->playerVelocity * 1.3f;
 		jumpingCounter += short(this->playerVelocity);
 
 		if (jumpingCounter > jumpingDuration) {
@@ -20,29 +22,30 @@ void Mario::update() {
 	}
 	// if falling
 	else if (jumping == -1) {
-		this->move(0.f, this->playerVelocity * 1.7f);
+		this->isMoving = true;
+		movement.y = this->playerVelocity * 1.7f;
 	}
+
+	this->animate(this->dt);
+	this->move(&movement);
+	
+	this->isMoving = false;
 }
 
-void Mario::updateKeyInput()
+void Mario::updateKeyInput(sf::Vector2f *movement)
 {
 	if (!this->isCrouching) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
 			this->facing = false;
 			this->isMoving = true;
 
-			this->move(-this->playerVelocity, 0.f);
-			
-			this->isMoving = false;
+			movement->x = -this->playerVelocity;
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
 			this->facing = true;
 			this->isMoving = true;
 
-			this->move(this->playerVelocity, 0.f);
-
-			this->isMoving = false;
-
+			movement->x = this->playerVelocity;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 			this->jump();
@@ -59,17 +62,29 @@ void Mario::updateKeyInput()
 
 void Mario::init(float X, float Y)
 {
-	this->shape.setPosition(X, Y);
-	this->playerTexture.loadFromFile(textureFile_small_idle);
-	this->shape.setTexture(this->playerTexture);
+	//change texture files to small/big
+	//load textures
+	this->playerTextureAnimated.loadFromFile(this->textureFile_small_animation);
+	this->shape.setTexture(this->playerTextureAnimated);
 
-	this->animation = new Animation(&this->playerTexture, Vector2u(3, 1), 0.3f);
+	this->animation = new Animation(&this->playerTextureAnimated, Vector2u(3, 3), 0.1f);
 	this->walkingOn = 0;
+
+	this->shape.setPosition(X, Y);
 }
 
 sf::FloatRect Mario::bounds()
 {
-	return this->shape.getGlobalBounds();
+
+	IntRect t_bounds = this->shape.getTextureRect();
+	FloatRect sBounds = this->shape.getGlobalBounds();
+
+	//sBounds.top = sBounds.top;
+	//sBounds.left -= t_bounds.left;
+	sBounds.width = abs(t_bounds.width);
+	sBounds.height = t_bounds.height;
+
+	return sBounds;
 }
 
 void Mario::setObjectsReference(std::vector<Object*>* objects)
@@ -77,11 +92,13 @@ void Mario::setObjectsReference(std::vector<Object*>* objects)
 	this->objects = objects;
 }
 
-void Mario::move(float x, float y)
+void Mario::move(Vector2f *movement)
 {
-	this->prevPos = { this->shape.getPosition().x, this->shape.getPosition().y };
+	FloatRect b = this->bounds();
+	this->prevPos = { b.left, b.top };
 
-	this->shape.move(x, y);
+	this->shape.move(*movement);
+
 	resolveColision();
 }
 
@@ -94,23 +111,15 @@ void Mario::jump()
 {
 	if (jumping != 0 || isBouncing) return;
 
-	startJumping();
 	this->walkingOn = 0;
+	this->jumping = 1;
 
 	// play sound
-	// change animation
 }
 
 void Mario::crouch()
 {
 	this->isCrouching = true;
-}
-
-void Mario::startJumping()
-{
-	if (this->jumping == 0) {
-		jumping = 1;
-	}
 }
 
 void Mario::endJumping()
@@ -148,12 +157,6 @@ void Mario::resolveColision()
 		if (obj->isWalkable()) {
 			std::string direction = this->collisionDirection(obj);
 
-			//if (direction == "" || direction == "TOP") {
-			//	bool isBelowPlayer = collisionBelow(obj);
-			//	if (isBelowPlayer)
-			//		sthBelow = true;
-			//}
-
 			if (direction == "") continue;
 
 			if (direction == "TOP") {
@@ -177,9 +180,13 @@ void Mario::resolveColision()
 	sf::FloatRect bounds = this->bounds();
 
 	bool withinBounds = !(bounds.left <= 0
-		|| bounds.left + bounds.width >= this->boundsW
+		|| bounds.left + abs(bounds.width) >= this->boundsW
 		|| bounds.top <= 0
 		|| bounds.top + bounds.height >= this->boundsH);
+
+	//std::cout << "withinBounds: " << withinBounds << " : " << bounds.left << " | " << bounds.left + abs(bounds.width)
+	//	<< " | " << bounds.top << " | " << bounds.top + bounds.height << std::endl;
+	// std::cout << "Postion: " << bounds.left << " " << bounds.top << " | " << this->prevPos.x << " " << this->prevPos.y << std::endl;
 
 	// check for border col
 	if (goBack == false) {
@@ -211,8 +218,8 @@ std::string Mario::collisionDirection(Object* colided)
 	float p_t = playerBounds.top;
 	float p_b = playerBounds.top + playerBounds.height;
 	float p_l = playerBounds.left;
-	float p_r = playerBounds.left + playerBounds.width;
-	float p_w = playerBounds.width;
+	float p_r = playerBounds.left + abs(playerBounds.width);
+	float p_w = abs(playerBounds.width);
 	float p_h = playerBounds.height;
 
 	float o_t = colidedBounds.top;
@@ -243,7 +250,7 @@ bool Mario::collisionBelow(Object* test)
 	float p_t = playerBounds.top;
 	float p_b = playerBounds.top + playerBounds.height + 2;
 	float p_l = playerBounds.left;
-	float p_r = playerBounds.left + playerBounds.width;
+	float p_r = playerBounds.left + abs(playerBounds.width);
 
 	sf::FloatRect colidedBounds = test->getShape().getGlobalBounds();
 	float o_t = colidedBounds.top;
@@ -255,7 +262,6 @@ bool Mario::collisionBelow(Object* test)
 	bool rightWithin = (p_r >= o_l && p_r <= o_r);
 	bool botWithin = (p_b >= o_t && p_b <= o_b);
 
-	// std::cout << "left: " << leftWithin << ", Right: " << rightWithin << ", bot: " << botWithin << std::endl;
 	if ((leftWithin || rightWithin) && botWithin)
 		return true;
 
@@ -287,6 +293,46 @@ void Mario::die()
 {
 }
 
-void Mario::animate()
+void Mario::animate(float deltaTime)
 {
+	unsigned short int row = 0;
+	if (this->isMoving == true) row = 1;
+	
+	// handle jumping
+	if (jumping != 0) { 
+		row = 2; 
+		int ar = this->animation->currentRow;
+		if (row != ar) {
+			this->animation->currentImg.y = row;
+		}
+
+		IntRect rect = this->animation->uvRect;
+		int frame = rect.left % abs(rect.width);
+
+		if (jumping == -1 && frame != 2) {
+			if (this->facing) {
+				rect.left = 2 * rect.width;
+				rect.width = abs(rect.width);
+			}
+			else {
+				rect.left = 3 * abs(rect.width);
+				rect.width = -abs(rect.width);
+			}
+		}
+		else if (jumping == 1 && frame != 0) {
+			if (this->facing) {
+				rect.left = 0;
+				rect.width = abs(rect.width);
+			}
+			else {
+				rect.left = 1 * abs(rect.width);
+				rect.width = -abs(rect.width);
+			}
+		}
+	}
+	else {
+		this->animation->update(row, this->dt, this->facing);
+	}
+
+	this->shape.setTextureRect(this->animation->uvRect);
 }
