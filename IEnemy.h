@@ -1,7 +1,9 @@
 #pragma once
-#include "Object.h"
 
-class IEnemy : public Object
+#include "Object.h"
+#include "IEntity.h"
+
+class IEnemy : public IEntity
 {
 protected:
 	bool canBeJumpedOn;
@@ -15,7 +17,7 @@ public:
 	bool isHurtable() { return canBeJumpedOn; };
 	virtual std::string name() = 0;
 
-	virtual void hit(Object *what) = 0;
+	virtual void hit(Object *what, std::string direction) = 0;
 	virtual void hurt() = 0;
 };
 
