@@ -1,6 +1,6 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 
+#include <SFML/Graphics.hpp>
 #include <string>
 
 class Object : public sf::Drawable
@@ -31,7 +31,7 @@ public:
 	// colisions
 	virtual void resolveColision() = 0;
 
-	virtual void hit(Object *what, std::string direction) = 0;
+	virtual void hit(Object *what, std::string direction) = 0; // *what <- hit this object
 	virtual void hurt() = 0;
 	virtual void die() = 0;
 };
