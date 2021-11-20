@@ -4,13 +4,17 @@
 
 int main()
 {
-	// init game
-	Game game;
+	Game* game = Game::getInstance();
 
-	// main loop
-	while (game.isRunning()) {
-		game.update();
-		game.render();
+	game->initVars();
+	game->initWindow();
+
+	game->initBlocks();
+	game->initPlayer();
+
+	while (game->isRunning()) {
+		game->update();
+		game->render();
 	}
 
 	return 0;

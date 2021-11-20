@@ -4,23 +4,20 @@
 #include "Mario.h"
 #include "Object.h"
 #include "BorderBlock.h"
+//#include "LevelManager.h"
 
 // namespace SFML
 using namespace sf;
 // namespace STD
 using namespace std;
 
-// struct/destruct
-Game::Game() {
-	this->initVars();
-	this->initWindow();
+Game* Game::_game = nullptr;
+Game* Game::getInstance() {
+	if (_game == nullptr) {
+		_game = new Game();
+	}
 
-	this->initPlayer();
-	this->initBlocks();
-}
-
-Game::~Game() {
-	delete this->window;
+	return _game;
 }
 
 const bool Game::isRunning() const
@@ -28,6 +25,10 @@ const bool Game::isRunning() const
 	return this->window->isOpen();
 }
 
+std::vector<Object*> Game::getObjects()
+{
+	return (this->objects);
+}
 
 void Game::initVars()
 {
@@ -48,14 +49,13 @@ void Game::initPlayer()
 	this->player->setPosition(float(this->videoMode.width / 2), float(this->videoMode.height - (this->player->bounds().height/3) - 1));
 
 	this->player->setVideoBounds(this->videoMode.width, this->videoMode.height);
-	this->player->setObjectsReference(&this->objects);
 }
 
 void Game::initBlocks()
 {
 	BorderBlock *b1 = new BorderBlock();
 	b1->init(this->videoMode.width / 3, this->videoMode.height - 40);
-	this->objects.push_back( dynamic_cast<Object*>(b1) );
+	this->objects.push_back(dynamic_cast<Object*>(b1));
 
 	BorderBlock *b2 = new BorderBlock();
 	b2->init(this->videoMode.width / 4, this->videoMode.height - 16);
@@ -68,6 +68,7 @@ void Game::initBlocks()
 	BorderBlock *b4 = new BorderBlock();
 	b4->init(this->videoMode.width / 4 - 32, this->videoMode.height - 16);
 	this->objects.push_back(dynamic_cast<Object*>(b4));
+
 }
 
 // game mechanics

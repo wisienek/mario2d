@@ -7,12 +7,16 @@
 #include <SFML/Audio.hpp>
 
 #include "Mario.h"
+#include "LevelManager.h"
 
 
 // game class
 class Game
 {
 private:
+	Game() {};
+	static Game* _game;
+
 	// window
 	sf::RenderWindow* window;
 	sf::VideoMode videoMode;
@@ -20,25 +24,24 @@ private:
 
 	// Entities
 	Mario* player;
+
+	//LevelManager levelManager;
 	std::vector<Object*> objects;
 
 	Clock clock;
-
-	// functions
-	void initVars();
-	void initWindow();
-	void initPlayer();
-	void initBlocks();
-
 public:
-	// constr/destr
-	Game();
-	virtual ~Game();
+	Game(Game &game) = delete;
+	void operator = (const Game &) = delete;
+
+	static Game* getInstance();
 
 	float deltaTime{ 0.f };
 
 	// access
 	const bool isRunning() const;
+	std::vector<Object*> getObjects();
+	sf::RenderWindow* getWindow() { return this->window; };
+	sf::VideoMode getVideoMode() { return this->videoMode; };
 
 	// functions
 	void update();
@@ -46,5 +49,11 @@ public:
 	void updateEntities();
 	void updateTime();
 	void render();
+
+	// init functions
+	void initVars();
+	void initWindow();
+	void initPlayer();
+	void initBlocks();
 };
 
