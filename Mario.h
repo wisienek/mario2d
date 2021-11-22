@@ -65,5 +65,8 @@ public:
 
 	//animation
 	virtual void animate(float deltaTime);
+
+
+	long getPoints() { return this->points; };
 };
 

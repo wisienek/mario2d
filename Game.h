@@ -21,18 +21,17 @@ private:
 	sf::RenderWindow* window;
 	sf::VideoMode videoMode;
 	sf::Event event;
+	sf::Font font;
 
 	// Entities
 	Mario* player;
 
-	//LevelManager levelManager;
-	std::vector<Object*> objects;
+	sf::Text pointsText;
 
 	Clock clock;
 public:
 	Game(Game &game) = delete;
 	void operator = (const Game &) = delete;
-
 	static Game* getInstance();
 
 	float deltaTime{ 0.f };
@@ -42,6 +41,7 @@ public:
 	std::vector<Object*> getObjects();
 	sf::RenderWindow* getWindow() { return this->window; };
 	sf::VideoMode getVideoMode() { return this->videoMode; };
+	LevelManager* getLevelManager();
 
 	// functions
 	void update();
@@ -50,8 +50,13 @@ public:
 	void updateTime();
 	void render();
 
+	void updateText();
+	void renderText();
+
 	// init functions
 	void initVars();
+	void initFont();
+	void initText();
 	void initWindow();
 	void initPlayer();
 	void initBlocks();

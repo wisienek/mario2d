@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <iostream>
+#include <sstream>
 
 #include "Mario.h"
 #include "Object.h"
@@ -25,9 +26,14 @@ const bool Game::isRunning() const
 	return this->window->isOpen();
 }
 
+LevelManager* Game::getLevelManager() 
+{
+	return LevelManager::getInstance();
+}
+
 std::vector<Object*> Game::getObjects()
 {
-	return (this->objects);
+	return LevelManager::getInstance()->getObjects();
 }
 
 void Game::initVars()
@@ -35,6 +41,21 @@ void Game::initVars()
 	this->window = nullptr;
 	this->videoMode.height = 600;
 	this->videoMode.width = 800;
+}
+
+void Game::initFont()
+{
+	if (!this->font.loadFromFile("./resources/fonts/SuperMarioWorldTextBoxRegular-Y86j.ttf"))
+		std::cout << "Font Not loaded!" << std::endl;
+}
+
+void Game::initText()
+{
+	this->pointsText.setFont(this->font);
+	this->pointsText.setCharacterSize(12);
+	this->pointsText.setPosition(20, 10);
+	this->pointsText.setFillColor(sf::Color::White);
+	this->pointsText.setString("Points	");
 }
 
 void Game::initWindow()
@@ -53,22 +74,7 @@ void Game::initPlayer()
 
 void Game::initBlocks()
 {
-	BorderBlock *b1 = new BorderBlock();
-	b1->init(this->videoMode.width / 3, this->videoMode.height - 40);
-	this->objects.push_back(dynamic_cast<Object*>(b1));
-
-	BorderBlock *b2 = new BorderBlock();
-	b2->init(this->videoMode.width / 4, this->videoMode.height - 16);
-	this->objects.push_back(dynamic_cast<Object*>(b2));
-
-	BorderBlock *b3 = new BorderBlock();
-	b3->init(this->videoMode.width / 4 - 16, this->videoMode.height - 16);
-	this->objects.push_back(dynamic_cast<Object*>(b3));
-
-	BorderBlock *b4 = new BorderBlock();
-	b4->init(this->videoMode.width / 4 - 32, this->videoMode.height - 16);
-	this->objects.push_back(dynamic_cast<Object*>(b4));
-
+	this->getLevelManager()->load(0);
 }
 
 // game mechanics
@@ -77,6 +83,7 @@ void Game::update()
 	this->updateTime();
 	this->updateEvents();
 	this->updateEntities();
+	this->updateText();
 }
 
 void Game::updateEvents()
@@ -107,7 +114,7 @@ void Game::updateEntities()
 	this->player->dt = this->deltaTime;
 
 	// auto get upper class
-	for (auto& i : objects) {
+	for (auto& i : this->getObjects()) {
 		Object *obj = dynamic_cast<Object*>(i);
 		if (!obj) continue;
 
@@ -129,12 +136,27 @@ void Game::render()
 
 	this->window->draw(*player);
 
-	for (auto& i : this->objects) {
+	for (auto& i : this->getObjects()) {
 		Object *obj = dynamic_cast<Object*>(i);
 		if (!obj) continue;
 
 		this->window->draw(*obj);
 	}
 
+
+	this->renderText();
 	this->window->display();
+}
+
+void Game::updateText()
+{
+	std::stringstream ss;
+	ss << "Points	" << this->player->getPoints();
+
+	this->pointsText.setString(ss.str());
+}
+
+void Game::renderText()
+{
+	this->window->draw(this->pointsText);
 }
