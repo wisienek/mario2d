@@ -12,6 +12,9 @@ int main()
 	game->initBlocks();
 	game->initPlayer();
 
+	game->initFont();
+	game->initText();
+
 	while (game->isRunning()) {
 		game->update();
 		game->render();
