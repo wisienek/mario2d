@@ -2,6 +2,7 @@
 
 #include "Mario.h"
 #include "Object.h"
+#include "SoundManager.h"
 
 Mario::Mario( float X, float Y ) {
 	init(X, Y);
@@ -70,12 +71,6 @@ void Mario::init(float X, float Y)
 	this->walkingOn = 0;
 
 	this->shape.setPosition(X, Y);
-
-	if (!this->jumpingBuffer.loadFromFile("./resources/sounds/jump-small.wav"))
-		std::cout << "Couldn't load junping sound!" << std::endl;
-
-	this->jumpingSound.setBuffer(this->jumpingBuffer);
-	this->jumpingSound.setVolume(2.f);
 }
 
 void Mario::jump()
@@ -85,7 +80,7 @@ void Mario::jump()
 	this->walkingOn = 0;
 	this->jumping = 1;
 
-	this->jumpingSound.play();
+	SoundManager::getInstance()->playMarioJump();
 }
 
 void Mario::crouch()
