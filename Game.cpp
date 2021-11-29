@@ -31,6 +31,11 @@ LevelManager* Game::getLevelManager()
 	return LevelManager::getInstance();
 }
 
+SoundManager* Game::getSoundManager()
+{
+	return SoundManager::getInstance();
+}
+
 std::vector<Object*> Game::getObjects()
 {
 	return LevelManager::getInstance()->getObjects();
@@ -39,8 +44,8 @@ std::vector<Object*> Game::getObjects()
 void Game::initVars()
 {
 	this->window = nullptr;
-	this->videoMode.height = 600;
-	this->videoMode.width = 800;
+	this->videoMode.height = 16 * 32;
+	this->videoMode.width = 16 * 32;
 }
 
 void Game::initFont()
@@ -53,7 +58,7 @@ void Game::initText()
 {
 	this->pointsText.setFont(this->font);
 	this->pointsText.setCharacterSize(12);
-	this->pointsText.setPosition(20, 10);
+	this->pointsText.setPosition(20, 18);
 	this->pointsText.setFillColor(sf::Color::White);
 	this->pointsText.setString("Points	");
 }
@@ -67,7 +72,7 @@ void Game::initWindow()
 void Game::initPlayer()
 {
 	this->player = new Mario(0.f, 0.f);
-	this->player->setPosition(float(this->videoMode.width / 2), float(this->videoMode.height - (this->player->bounds().height/3) - 1));
+	this->player->setPosition(float(this->videoMode.width / 2), float(this->videoMode.height - ((this->player->bounds().height/3) * 2) - 1));
 
 	this->player->setVideoBounds(this->videoMode.width, this->videoMode.height);
 }

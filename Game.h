@@ -8,6 +8,7 @@
 
 #include "Mario.h"
 #include "LevelManager.h"
+#include "SoundManager.h"
 
 
 // game class
@@ -42,6 +43,7 @@ public:
 	sf::RenderWindow* getWindow() { return this->window; };
 	sf::VideoMode getVideoMode() { return this->videoMode; };
 	LevelManager* getLevelManager();
+	SoundManager* getSoundManager();
 
 	// functions
 	void update();

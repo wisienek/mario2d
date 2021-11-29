@@ -20,6 +20,7 @@ public:
 	static LevelManager* getInstance();
 
 	void load(int level);
+	void initWalls();
 
 	std::vector<Object*> getObjects() {
 		return Objects;
