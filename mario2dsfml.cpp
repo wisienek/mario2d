@@ -5,6 +5,7 @@
 int main()
 {
 	Game* game = Game::getInstance();
+	SoundManager* sm = SoundManager::getInstance();
 
 	game->initVars();
 	game->initWindow();
@@ -14,6 +15,8 @@ int main()
 
 	game->initFont();
 	game->initText();
+
+	sm->initSounds();
 
 	while (game->isRunning()) {
 		game->update();
