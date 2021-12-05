@@ -26,28 +26,21 @@ void LevelManager::load(int level)
 
 	this->initWalls();
 
-	//std::ifstream i("file.json");
-	//json j;
-	//i >> j;
+	std::ifstream i("./levels/level1.json");
+	json j;
+	i >> j;
 	
+	// read blocks from file
+	for (auto Block : j["blocks"]) {
+		// { name, location{x,y} };
+		std::string name = Block["name"];
+		sf::Vector2i location{ Block["location"]["x"], Block["location"]["y"] };
 
-
-	//BorderBlock *b1 = new BorderBlock();
-	//b1->init(vm.width / 3, vm.height - 40);
-	//this->Objects.push_back(dynamic_cast<Object*>(b1));
-
-	//BorderBlock *b2 = new BorderBlock();
-	//b2->init(vm.width / 4, vm.height - 16);
-	//this->Objects.push_back(dynamic_cast<Object*>(b2));
-
-	//BorderBlock *b3 = new BorderBlock();
-	//b3->init(vm.width / 4 - 16, vm.height - 16);
-	//this->Objects.push_back(dynamic_cast<Object*>(b3));
-
-	//BorderBlock *b4 = new BorderBlock();
-	//b4->init(vm.width / 4 - 32, vm.height - 16);
-	//this->Objects.push_back(dynamic_cast<Object*>(b4));
-
+		// swtich/case name
+		BorderBlock *b1 = new BorderBlock();
+		b1->init( location );
+		this->Objects.push_back(dynamic_cast<Object*>(b1));
+	}
 }
 
 void LevelManager::initWalls()

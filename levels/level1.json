@@ -1,0 +1,14 @@
+{
+    "blocks": [
+        {
+            "name": "BorderBlock",
+            "location": {
+                "x": 256,
+                "y": 448
+            }
+        }
+    ],
+    "enemies": [
+        
+    ]
+}
