@@ -38,13 +38,13 @@ void Mario::updateKeyInput(sf::Vector2f *movement)
 {
 	if (!this->isCrouching) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-			this->facing = false;
+			this->facingRight = false;
 			this->isMoving = true;
 
 			movement->x = -this->playerVelocity;
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-			this->facing = true;
+			this->facingRight = true;
 			this->isMoving = true;
 
 			movement->x = this->playerVelocity;
@@ -68,7 +68,7 @@ void Mario::init(float X, float Y)
 	this->shape.setTexture(this->playerTextureAnimated);
 
 	this->animation = new Animation(&this->playerTextureAnimated, Vector2u(3, 3), 0.1f);
-	this->walkingOn = 0;
+	this->walkingOn = nullptr;
 
 	this->shape.setPosition(X, Y);
 }
@@ -103,7 +103,7 @@ void Mario::fire()
 	if (this->canFire) {
 		// create new instance of fire
 		// direction: 1-right, -1 left
-		short int direction = this->facing == true ? 1 : -1;
+		short int direction = this->facingRight == true ? 1 : -1;
 		// new PlayerFire(this);
 	}
 }
@@ -138,7 +138,7 @@ void Mario::animate(float deltaTime)
 		int frame = rect.left % abs(rect.width);
 
 		if (jumping == -1 && frame != 2) {
-			if (this->facing) {
+			if (this->facingRight) {
 				rect.left = 2 * rect.width;
 				rect.width = abs(rect.width);
 			}
@@ -148,7 +148,7 @@ void Mario::animate(float deltaTime)
 			}
 		}
 		else if (jumping == 1 && frame != 0) {
-			if (this->facing) {
+			if (this->facingRight) {
 				rect.left = 0;
 				rect.width = abs(rect.width);
 			}
@@ -159,7 +159,7 @@ void Mario::animate(float deltaTime)
 		}
 	}
 	else {
-		this->animation->update(row, this->dt, this->facing);
+		this->animation->update(row, this->dt, this->facingRight);
 	}
 
 	this->shape.setTextureRect(this->animation->uvRect);

@@ -9,8 +9,6 @@ protected:
 	bool canBeJumpedOn;
 
 public:
-	IEnemy();
-
 	short int width;
 	short int height;
 

@@ -9,6 +9,12 @@
         }
     ],
     "enemies": [
-        
+        {
+            "name": "Goomba",
+            "location": {
+                "x": 256,
+                "y": 432
+            }
+        }
     ]
 }

@@ -43,7 +43,7 @@ public:
 	// x,y - default position
 	Mario( float X=0, float Y=0 );
 
-	// destructuring
+	// destroying default constructors
 	Mario() = delete;
 	~Mario() = default;
 

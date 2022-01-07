@@ -10,8 +10,9 @@ protected:
 	// basic properties
 	short int hp = 3;
 
-	bool isMoving = false;
-	bool canCollide = true;
+	bool isMoving = false; // is Entity moving?
+	bool canCollide = true; // Can Entity collide with sth?
+	bool isAlive = true; // Is Entity alive? - for animation etc.
 
 	// movement
 	Vector2f prevPos{ 0, 0 }; // prev pos for backing
@@ -21,7 +22,7 @@ protected:
 	short int jumpingDuration{ 60 }; // How high can jump
 	short int jumpingCounter{ 0 }; // How high already jumped
 
-	bool facing = true; // Facing: true - right, false - left
+	bool facingRight = true; // Facing: true - right, false - left
 
 	// references
 	Object* walkingOn; // What the ENtity is walking on (0 / pointer)

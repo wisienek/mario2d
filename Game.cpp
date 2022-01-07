@@ -41,6 +41,11 @@ std::vector<Object*> Game::getObjects()
 	return LevelManager::getInstance()->getObjects();
 }
 
+std::vector<IEntity*> Game::getEntities()
+{
+	return LevelManager::getInstance()->getEntities();
+}
+
 void Game::initVars()
 {
 	this->window = nullptr;
@@ -126,6 +131,14 @@ void Game::updateEntities()
 		obj->update();
 		obj->animate(this->deltaTime);
 	}
+
+	for (auto& i : this->getEntities()) {
+		IEntity *obj = dynamic_cast<IEntity*>(i);
+		if (!obj) continue;
+
+		obj->update();
+		obj->animate(this->deltaTime);
+	}
 }
 
 void Game::updateTime()
@@ -143,6 +156,13 @@ void Game::render()
 
 	for (auto& i : this->getObjects()) {
 		Object *obj = dynamic_cast<Object*>(i);
+		if (!obj) continue;
+
+		this->window->draw(*obj);
+	}
+
+	for (auto& i : this->getEntities()) {
+		IEntity *obj = dynamic_cast<IEntity*>(i);
 		if (!obj) continue;
 
 		this->window->draw(*obj);

@@ -2,11 +2,13 @@
 
 #include "Game.h"
 #include "BorderBlock.h"
+#include "Goomba.h"
 
 #include <nlohmann/json.hpp>
 
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 using namespace nlohmann;
 
@@ -33,13 +35,28 @@ void LevelManager::load(int level)
 	// read blocks from file
 	for (auto Block : j["blocks"]) {
 		// { name, location{x,y} };
-		std::string name = Block["name"];
-		sf::Vector2i location{ Block["location"]["x"], Block["location"]["y"] };
+		std::string name = Block["name"]; // block's name
+		sf::Vector2i location{ Block["location"]["x"], Block["location"]["y"] }; // block's location
 
-		// swtich/case name
-		BorderBlock *b1 = new BorderBlock();
-		b1->init( location );
-		this->Objects.push_back(dynamic_cast<Object*>(b1));
+		if (!this->isBlockNameValid(name)) continue;
+
+		if (name == "BorderBlock") {
+			BorderBlock *b1 = new BorderBlock();
+			b1->init(location);
+			this->Objects.push_back(dynamic_cast<Object*>(b1));
+		}
+	}
+
+	for (auto Enemy : j["enemies"]) {
+		std::string name = Enemy["name"]; // Enemy name
+		sf::Vector2i location{ Enemy["location"]["x"], Enemy["location"]["y"] }; // Enemy location
+
+		if (!this->isEnemyNameValid(name)) continue;
+
+		if (name == "Goomba") {
+			Goomba *g1 = new Goomba(location.x, location.y);
+			this->Objects.push_back(dynamic_cast<IEntity*>(g1));
+		}
 	}
 }
 
@@ -70,7 +87,16 @@ void LevelManager::initWalls()
 		b2->init(float(_k * 16), vm.height - 16);
 		this->Objects.push_back(dynamic_cast<Object*>(b2));
 	}
+}
 
+bool LevelManager::isBlockNameValid(std::string name)
+{
+	return std::find(this->validBlocks.begin(), this->validBlocks.end(), name) != this->validBlocks.end();
+}
+
+bool LevelManager::isEnemyNameValid(std::string name)
+{
+	return std::find(this->validEnemies.begin(), this->validEnemies.end(), name) != this->validEnemies.end();
 }
 
 

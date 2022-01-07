@@ -9,6 +9,7 @@
 #include "Mario.h"
 #include "LevelManager.h"
 #include "SoundManager.h"
+#include "IEnemy.h"
 
 
 // game class
@@ -40,6 +41,7 @@ public:
 	// access
 	const bool isRunning() const;
 	std::vector<Object*> getObjects();
+	std::vector<IEntity*> getEntities();
 	sf::RenderWindow* getWindow() { return this->window; };
 	sf::VideoMode getVideoMode() { return this->videoMode; };
 	LevelManager* getLevelManager();

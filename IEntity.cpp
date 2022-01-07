@@ -24,8 +24,8 @@ FloatRect IEntity::bounds()
 	IntRect t_bounds = this->shape.getTextureRect(); // Current frame texture
 	FloatRect sBounds = this->shape.getGlobalBounds(); // global texture (can have a few -''-)
 
-	sBounds.width = abs(t_bounds.width);
-	sBounds.height = t_bounds.height;
+	sBounds.width = float(abs(t_bounds.width));
+	sBounds.height = float(t_bounds.height);
 
 	return sBounds;
 }
