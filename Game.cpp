@@ -65,13 +65,13 @@ void Game::initText()
 	this->pointsText.setCharacterSize(12);
 	this->pointsText.setPosition(20, 18);
 	this->pointsText.setFillColor(sf::Color::White);
-	this->pointsText.setString("Points	");
+	this->pointsText.setString("Points	" + this->points);
 
 	this->endingText.setFont(this->font);
 	this->endingText.setCharacterSize(16);
-	this->endingText.setPosition(this->videoMode.width/2, this->videoMode.height/2);
+	this->endingText.setPosition(this->videoMode.width/2 - 50, this->videoMode.height/2);
 	this->endingText.setFillColor(sf::Color::White);
-	this->endingText.setString("GAME OVER!\nPoints: " + this->points);
+	this->endingText.setString("GAME OVER!\nPoints:   " + this->points);
 }
 
 void Game::initWindow()
@@ -91,27 +91,28 @@ void Game::initPlayer()
 
 void Game::initBlocks()
 {
+	// load level 0
 	this->getLevelManager()->load(0);
 }
 
 void Game::showEndingScreen()
 {
-	this->window->clear(Color::Black);
+	this->endingText.setString("GAME OVER!\nPoints:   " + this->points);
+
 	this->window->draw(this->endingText);
+	this->window->display();
 }
 
 // game mechanics
 void Game::update()
 {
-	if (this->isGameOver()) {
-		this->showEndingScreen();
-		return;
-	}
+	this->updateEvents();
+	this->updateText();
+
+	if (this->isGameOver()) return;
 
 	this->updateTime();
-	this->updateEvents();
 	this->updateEntities();
-	this->updateText();
 }
 
 void Game::updateEvents()
@@ -152,6 +153,7 @@ void Game::updateEntities()
 
 	for (auto& i : this->getEntities()) {
 		IEntity *obj = dynamic_cast<IEntity*>(i);
+
 		if (!obj) continue;
 		if (!obj->isAlive) {
 			this->removeObject(obj);
@@ -174,6 +176,9 @@ void Game::render()
 {
 	// drawing game
 	this->window->clear(Color::Black);
+
+	if(this->isGameOver())
+		return this->showEndingScreen();
 
 	this->window->draw(*player);
 
@@ -213,4 +218,14 @@ void Game::renderText()
 void Game::removeObject(Object * object)
 {
 	this->getLevelManager()->removeObject(object);
+}
+
+void Game::addPoints(long _points)
+{
+	this->points += _points;
+
+	if (maxPoints != 0 && this->points >= maxPoints) {
+		this->getSoundManager()->gameover();
+		this->state = false;
+	}
 }

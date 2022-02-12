@@ -29,6 +29,8 @@ private:
 	Mario* player;
 
 	long points = 0;
+	long maxPoints = 0;
+
 	sf::Text pointsText;
 	sf::Text endingText;
 
@@ -62,6 +64,10 @@ public:
 		state = false;
 	}
 
+	long getMaxPoints() {
+		return this->maxPoints;
+	}
+
 	// functions
 	void update();
 	void updateEvents();
@@ -74,9 +80,7 @@ public:
 
 	void removeObject(Object* object);
 
-	void addPoints(long _points) {
-		this->points += _points;
-	}
+	void addPoints(long _points);
 
 	// init functions
 	void initVars();
@@ -86,5 +90,8 @@ public:
 	void initPlayer();
 	void initBlocks();
 	void showEndingScreen();
+	void setMaxPoints(long _points) {
+		this->maxPoints = _points;
+	}
 };
 
