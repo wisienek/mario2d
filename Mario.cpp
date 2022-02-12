@@ -126,10 +126,14 @@ void Mario::hit(Object * what, std::string direction)
 
 void Mario::hurt()
 {
-	if (this->hp - 1 < 0) 
-		return this->die();
-	
+	if (!this->isAlive || this->invincible) return;
+
 	this->hp -= 1;
+
+	if (this->hp < 0) 
+		return this->die();
+
+	Game::getInstance()->getSoundManager()->playershrink();
 }
 
 void Mario::die()
@@ -138,6 +142,7 @@ void Mario::die()
 	Game* game = Game::getInstance();
 
 	game->setGameOver();
+	game->getSoundManager()->playerdead();
 }
 
 void Mario::animate(float deltaTime)
