@@ -16,6 +16,7 @@ private:
 
 	std::vector<std::string> validBlocks{ "BorderBlock" };
 	std::vector<std::string> validEnemies{ "Goomba" };
+	std::vector<std::string> validEntities{ "Coin" };
 public:
 	// prevent copying manager
 	LevelManager(LevelManager &manager) = delete;
@@ -27,7 +28,8 @@ public:
 	void initWalls();
 
 	bool isBlockNameValid(std::string name); // check if block's name is on the list
-	bool isEnemyNameValid(std::string name); // check if block's name is on the list
+	bool isEnemyNameValid(std::string name); // check if enemy's name is on the list
+	bool isEntityNameValid(std::string name); // check if entity's name is on the list
 
 	std::vector<Object*> getObjects() {
 		return Objects;
@@ -38,5 +40,7 @@ public:
 	}
 
 	void removeObject(Object* object);
+
+	bool objectWithinBounds(int x, int y, unsigned short int width, unsigned short int height);
 };
 

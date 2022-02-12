@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "BorderBlock.h"
 #include "Goomba.h"
+#include "Coin.h"
 
 #include <nlohmann/json.hpp>
 
@@ -56,6 +57,22 @@ void LevelManager::load(int level)
 		if (name == "Goomba") {
 			Goomba *g1 = new Goomba(location.x, location.y);
 			this->Entities.push_back(dynamic_cast<IEntity*>(g1));
+
+			game->setMaxPoints( game->getMaxPoints() + Goomba::killPoints );
+		}
+	}
+
+	for (auto Entity : j["collectables"]) {
+		std::string name = Entity["name"]; // Entity name
+		sf::Vector2i location{ Entity["location"]["x"], Entity["location"]["y"] }; // Entity location
+
+		if (!this->isEntityNameValid(name)) continue;
+
+		if (name == "Coin") {
+			Coin *c1 = new Coin(location.x, location.y);
+			this->Objects.push_back(c1);
+
+			game->setMaxPoints( game->getMaxPoints() + Coin::killPoints );
 		}
 	}
 }
@@ -99,6 +116,11 @@ bool LevelManager::isEnemyNameValid(std::string name)
 	return std::find(this->validEnemies.begin(), this->validEnemies.end(), name) != this->validEnemies.end();
 }
 
+bool LevelManager::isEntityNameValid(std::string name)
+{
+	return std::find(this->validEntities.begin(), this->validEntities.end(), name) != this->validEntities.end();
+}
+
 void LevelManager::removeObject(Object * object)
 {
 	IEntity* ent = dynamic_cast<IEntity*>(object);
@@ -114,5 +136,31 @@ void LevelManager::removeObject(Object * object)
 			}
 		}
 	}
+	else {
+		for (auto it = this->Objects.begin(); it != this->Objects.end(); it++) {
+			if ((*it)->id == object->id) {
+				std::cout << "Removed " << *it << " element!" << std::endl;
+
+				this->Objects.erase(it);
+				delete object;
+				return;
+			}
+		}
+	}
+}
+
+bool LevelManager::objectWithinBounds(int x, int y, unsigned short int width, unsigned short int height)
+{
+	Game* game = Game::getInstance();
+
+	int screenWidth = game->getVideoMode().width;
+	int screenHeight = game->getVideoMode().height;
+
+	// starting position is outside screen
+	if (x >= screenWidth || y >= screenHeight) return false;
+	// end of texture is outside
+	if (x + width > screenWidth || y + height > screenHeight) return false;
+
+	return true;
 }
 

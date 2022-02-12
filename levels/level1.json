@@ -16,5 +16,14 @@
                 "y": 432
             }
         }
+    ],
+    "collectables": [
+        {
+            "name": "Coin",
+            "location": {
+                "x": 256,
+                "y": 382
+            }
+        }
     ]
 }
