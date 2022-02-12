@@ -3,9 +3,12 @@
 #include "Mario.h"
 #include "Object.h"
 #include "SoundManager.h"
+#include "IEnemy.h"
+#include "Game.h"
 
 Mario::Mario( float X, float Y ) {
 	init(X, Y);
+	this->jumping = 0;
 }
 
 void Mario::update() {
@@ -108,6 +111,19 @@ void Mario::fire()
 	}
 }
 
+void Mario::hit(Object * what, std::string direction)
+{
+	if (what->name() == "Goomba" && direction == "BOTTOM") {
+		what->die();
+		return;
+	}
+
+	IEnemy* enemy = dynamic_cast<IEnemy*>(what);
+	if (enemy) {
+		this->hurt();
+	}
+}
+
 void Mario::hurt()
 {
 	if (this->hp - 1 < 0) 
@@ -118,7 +134,10 @@ void Mario::hurt()
 
 void Mario::die()
 {
-	// set animation to dying and end game
+	this->isAlive = false;
+	Game* game = Game::getInstance();
+
+	game->setGameOver();
 }
 
 void Mario::animate(float deltaTime)

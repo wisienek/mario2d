@@ -19,6 +19,8 @@ Animation::~Animation()
 // update texture
 void Animation::update(int row, float deltaTime, bool facingRight)
 {
+	// std::cout << "Update: " << row << " dt: " << deltaTime << " right: " << facingRight << std::endl;
+
 	this->currentRow = row;
 
 	this->currentImg.y = this->currentRow;

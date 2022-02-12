@@ -13,6 +13,10 @@ private:
 	Animation* animation;
 
 	bool walkingRight = true;
+	bool canBeJumpedOn = true;
+	bool walkable = false;
+	bool collidable = true;
+	bool collectable = false;
 
 	void init(float X, float Y);
 public:
@@ -21,9 +25,9 @@ public:
 	virtual std::string name() { return "Goomba"; };
 
 	//functions
-	virtual void hit(Object *what, std::string direction) {};
+	virtual void hit(Object *what, std::string direction);
 	virtual void hurt() {};
-	virtual void die() {};
+	virtual void die();
 
 	//animation
 	virtual void animate(float deltaTime);

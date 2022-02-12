@@ -66,6 +66,12 @@ void Game::initText()
 	this->pointsText.setPosition(20, 18);
 	this->pointsText.setFillColor(sf::Color::White);
 	this->pointsText.setString("Points	");
+
+	this->endingText.setFont(this->font);
+	this->endingText.setCharacterSize(16);
+	this->endingText.setPosition(this->videoMode.width/2, this->videoMode.height/2);
+	this->endingText.setFillColor(sf::Color::White);
+	this->endingText.setString("GAME OVER!\nPoints: " + this->points);
 }
 
 void Game::initWindow()
@@ -77,9 +83,10 @@ void Game::initWindow()
 void Game::initPlayer()
 {
 	this->player = new Mario(0.f, 0.f);
-	this->player->setPosition(float(this->videoMode.width / 2), float(this->videoMode.height - ((this->player->bounds().height/3) * 2) - 1));
-
-	this->player->setVideoBounds(this->videoMode.width, this->videoMode.height);
+	this->player->setPosition(
+		float(this->videoMode.width / 2), 
+		float(this->videoMode.height - ((this->player->bounds().height/3) * 2) - 1)
+	);
 }
 
 void Game::initBlocks()
@@ -87,9 +94,20 @@ void Game::initBlocks()
 	this->getLevelManager()->load(0);
 }
 
+void Game::showEndingScreen()
+{
+	this->window->clear(Color::Black);
+	this->window->draw(this->endingText);
+}
+
 // game mechanics
 void Game::update()
 {
+	if (this->isGameOver()) {
+		this->showEndingScreen();
+		return;
+	}
+
 	this->updateTime();
 	this->updateEvents();
 	this->updateEntities();
@@ -135,8 +153,13 @@ void Game::updateEntities()
 	for (auto& i : this->getEntities()) {
 		IEntity *obj = dynamic_cast<IEntity*>(i);
 		if (!obj) continue;
+		if (!obj->isAlive) {
+			this->removeObject(obj);
+			continue;
+		}
 
 		obj->update();
+		obj->dt = this->deltaTime;
 		obj->animate(this->deltaTime);
 	}
 }
@@ -164,6 +187,7 @@ void Game::render()
 	for (auto& i : this->getEntities()) {
 		IEntity *obj = dynamic_cast<IEntity*>(i);
 		if (!obj) continue;
+		if (!obj->isAlive) continue;
 
 		this->window->draw(*obj);
 	}
@@ -176,7 +200,7 @@ void Game::render()
 void Game::updateText()
 {
 	std::stringstream ss;
-	ss << "Points	" << this->player->getPoints();
+	ss << "Points	" << this->points;
 
 	this->pointsText.setString(ss.str());
 }
@@ -184,4 +208,9 @@ void Game::updateText()
 void Game::renderText()
 {
 	this->window->draw(this->pointsText);
+}
+
+void Game::removeObject(Object * object)
+{
+	this->getLevelManager()->removeObject(object);
 }

@@ -14,6 +14,7 @@ protected:
 	// drawing shape
 	void draw(sf::RenderTarget& target, sf::RenderStates state) const override;
 public:
+	unsigned int id;
 	Object();
 
 	bool isWalkable() { return walkable; };

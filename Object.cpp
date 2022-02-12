@@ -2,6 +2,8 @@
 
 Object::Object()
 {
+	static int _id = 0;
+	this->id = _id++;
 }
 
 // const - nie zmienia pól klasy

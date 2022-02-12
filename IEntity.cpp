@@ -6,6 +6,13 @@
 
 void IEntity::move(Vector2f * movement)
 {
+	if (this->isAlive == false) return;
+
+	if (movement->x == 0 && movement->y == 0)
+		return;
+
+	// std::cout << "Movement: " << this->name() << " " << movement->x << " " << movement->y << std::endl;
+
 	FloatRect b = this->bounds();
 	this->prevPos = { b.left, b.top };
 
@@ -30,62 +37,67 @@ FloatRect IEntity::bounds()
 	return sBounds;
 }
 
-void IEntity::setVideoBounds(const int w, const int h)
-{
-	this->boundsW = w;
-	this->boundsH = h;
-}
-
 void IEntity::resolveColision()
 {
 	if (canCollide == false) return;
 	bool goBack = false;
 
 	std::vector<Object*> objects = Game::getInstance()->getObjects();
+	std::vector<IEntity*> entities = Game::getInstance()->getEntities();
+
+	objects.insert(objects.end(), entities.begin(), entities.end());
+
+	if (this->name() != "Mario")
+		objects.push_back(dynamic_cast<Object*>(Game::getInstance()->getPlayer()));
 
 	// loop through every object
 	for (auto& i : objects) {
 		Object *obj = dynamic_cast<Object*>(i);
 		if (!obj) continue;
 
-		// ignore if can't collide
-		if (!obj->isCollidable()) continue;
+		if (obj->name() != "Mario") {
+			// ignore if can't collide
+			if (!obj->isCollidable()) continue;
 
-		// ignore if not collectable
-		if (obj->isCollectable()) continue;
-
-		// blocks
-		if (obj->isWalkable()) {
-			std::string direction = this->collisionDirection(obj);
-
-			if (direction == "") continue;
-
-			if (direction == "TOP") {
-				if (this->jumping == -1)
-					this->jumping = 0;
-
-				this->walkingOn = obj;
-			}
-
-			if (direction == "BOTTOM" && this->jumping == 1)
-				this->jumping = -1;
-
-			obj->hit(this, direction);
-
-			goBack = true;
+			// ignore if not collectable
+			if (obj->isCollectable()) continue;
 		}
+
+		std::string direction = this->collisionDirection(obj);
+
+		//std::cout << "Direction: " << direction << std::endl;
+
+		if (direction == "") continue;
+
+		if (direction == "TOP") {
+			if (this->jumping == -1)
+				this->jumping = 0;
+
+			if(obj->isWalkable())
+				this->walkingOn = obj;
+		}
+
+		if (direction == "BOTTOM" && this->jumping == 1) {
+			this->jumping = -1;
+		}
+
+		obj->hit(this, direction);
 
 		goBack = true;
 	}
 
 	sf::FloatRect bounds = this->bounds();
 
-	bool withinBounds = !(bounds.left <= 0
-		|| bounds.left + abs(bounds.width) >= this->boundsW
-		|| bounds.top <= 0
-		|| bounds.top + bounds.height >= this->boundsH);
+	unsigned int boundsW = Game::getInstance()->getVideoMode().width;
+	unsigned int boundsH = Game::getInstance()->getVideoMode().height;
 
-	//std::cout << "withinBounds: " << withinBounds << " : " << bounds.left << " | " << bounds.left + abs(bounds.width)
+	// doesn't go outside screen
+	bool withinBounds = !(bounds.left <= 0
+		|| bounds.left + abs(bounds.width) >= boundsW
+		|| bounds.top <= 0
+		|| bounds.top + bounds.height >= boundsH);
+
+	// std::cout << "withinBounds: " << withinBounds << " : " << bounds.left << " | " << bounds.left + abs(bounds.width)
 	//	<< " | " << bounds.top << " | " << bounds.top + bounds.height << std::endl;
 	// std::cout << "Postion: " << bounds.left << " " << bounds.top << " | " << this->prevPos.x << " " << this->prevPos.y << std::endl;
 
@@ -96,12 +108,19 @@ void IEntity::resolveColision()
 			this->walkingOn = 0;
 		}
 		// stop falling
-		if (this->jumping == -1 && bounds.top + bounds.height >= this->boundsH)
+		if (this->jumping == -1 && bounds.top + bounds.height >= boundsH)
 			this->jumping = 0;
 	}
 
-	if (goBack)
+	// std::cout << "Colided: " << goBack << std::endl;
+
+	if (goBack) {
+		if (this->name() == "Goomba") {
+			this->facingRight = !this->facingRight;
+		}
+
 		this->shape.setPosition(this->prevPos);
+	}
 	else {
 		if (this->walkingOn && !collisionBelow(this->walkingOn)) {
 			this->jumping = -1;
@@ -114,7 +133,8 @@ std::string IEntity::collisionDirection(Object * colided)
 	sf::FloatRect entityBounds = this->bounds();
 	sf::FloatRect colidedBounds = colided->getShape().getGlobalBounds();
 
-	if (entityBounds.intersects(colidedBounds) == false) return "";
+	bool entityIntersects = entityBounds.intersects(colidedBounds);
+	if (entityIntersects == false) return "";
 
 	float p_t = entityBounds.top;
 	float p_b = entityBounds.top + entityBounds.height;
@@ -130,7 +150,7 @@ std::string IEntity::collisionDirection(Object * colided)
 	float o_w = colidedBounds.width;
 	float o_h = colidedBounds.height;
 
-	if ((p_b > o_t && p_b < o_b - (o_h * 3 / 4)) && ((p_l > o_l && p_l < o_r) || (p_r < o_r && p_r > o_l)))
+	if ((p_b > o_t && p_b < o_b - (o_h * 2 / 3)) && ((p_l > o_l && p_l < o_r) || (p_r < o_r && p_r > o_l)))
 		return "TOP";
 	if ((p_t > o_t + (o_h * 3 / 4) && p_t <= o_b) && ((p_l >= o_l && p_l <= o_r) || (p_r >= o_l && p_r <= o_r)))
 		return "BOTTOM";
@@ -167,4 +187,9 @@ bool IEntity::collisionBelow(Object *test)
 		return true;
 
 	return false;
+}
+
+void IEntity::die()
+{
+	this->isAlive = false;
 }

@@ -1,29 +1,58 @@
 #include "Goomba.h"
 #include "Animation.h"
+#include "Game.h"
 
 #include <iostream>
 
 Goomba::Goomba(float x, float y)
 {
 	init(x, y);
+
+	// set to falling on init to reset position (not to float in one axis)
+	this->jumping = -1;
+}
+
+void Goomba::hit(Object * what, std::string direction)
+{
+
+}
+
+void Goomba::die()
+{
+	this->isAlive = false;
+
+	Game *game = Game::getInstance();
+	game->addPoints(100);
 }
 
 void Goomba::animate(float deltaTime)
 {
 	if (!this->isAlive) return;
 
-	std::cout << "Goomba animation!";
-
-	this->animation->update(0, this->dt, this->facingRight);
+	this->animation->update(0, deltaTime * 0.1, this->facingRight);
 
 	this->shape.setTextureRect(this->animation->uvRect);
 }
 
 void Goomba::update()
 {
-	sf::Vector2f movement{ this->facingRight? 0.5f : -0.5f, 0.f };
+	if (this->isAlive == false) {
+		std::cout << "DEAD!" << std::endl;
+	}
+	sf::Vector2f movement{ 
+		this->facingRight ? 
+			0.6f : -0.6f, 
+		this->jumping == -1 ? 
+			1.2f : 0.0f 
+	};
 
-	this->animate(this->dt);
+	if (movement.x != 0 && movement.y != 0)
+		this->isMoving = true;
+	else
+		this->isMoving = false;
+
+	//std::cout << "jumping: " << this->jumping << " " << movement.y << std::endl;
+
 	this->move(&movement);
 }
 

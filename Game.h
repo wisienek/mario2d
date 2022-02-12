@@ -28,7 +28,11 @@ private:
 	// Entities
 	Mario* player;
 
+	long points = 0;
 	sf::Text pointsText;
+	sf::Text endingText;
+
+	bool state = true; // 0 - game over, 1 - playing
 
 	Clock clock;
 public:
@@ -47,6 +51,17 @@ public:
 	LevelManager* getLevelManager();
 	SoundManager* getSoundManager();
 
+	Mario* getPlayer() {
+		return this->player;
+	}
+
+	bool isGameOver() {
+		return state == false;
+	}
+	void setGameOver() {
+		state = false;
+	}
+
 	// functions
 	void update();
 	void updateEvents();
@@ -57,6 +72,12 @@ public:
 	void updateText();
 	void renderText();
 
+	void removeObject(Object* object);
+
+	void addPoints(long _points) {
+		this->points += _points;
+	}
+
 	// init functions
 	void initVars();
 	void initFont();
@@ -64,5 +85,6 @@ public:
 	void initWindow();
 	void initPlayer();
 	void initBlocks();
+	void showEndingScreen();
 };
 

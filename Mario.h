@@ -28,9 +28,11 @@ private:
 	bool isBouncing = false;
 	bool isCrouching = false;
 	bool canFire = false;
-	
-	// game system
-	long points = 0;
+
+	bool canBeJumpedOn = true;
+	bool walkable = false;
+	bool collidable = true;
+	bool collectable = false;
 
 	// movement
 	const float playerVelocity{ 1.3f };
@@ -56,17 +58,13 @@ public:
 	// can be in base class of entity
 	void endJumping();
 
-
 	//functions
 	void fire();
-	virtual void hit(Object *what, std::string direction) {};
+	virtual void hit(Object *what, std::string direction);
 	virtual void hurt();
 	virtual void die();
 
 	//animation
 	virtual void animate(float deltaTime);
-
-
-	long getPoints() { return this->points; };
 };
 

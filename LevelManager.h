@@ -36,5 +36,7 @@ public:
 	std::vector<IEntity*> getEntities() {
 		return Entities;
 	}
+
+	void removeObject(Object* object);
 };
 

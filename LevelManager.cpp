@@ -55,7 +55,7 @@ void LevelManager::load(int level)
 
 		if (name == "Goomba") {
 			Goomba *g1 = new Goomba(location.x, location.y);
-			this->Objects.push_back(dynamic_cast<IEntity*>(g1));
+			this->Entities.push_back(dynamic_cast<IEntity*>(g1));
 		}
 	}
 }
@@ -99,4 +99,20 @@ bool LevelManager::isEnemyNameValid(std::string name)
 	return std::find(this->validEnemies.begin(), this->validEnemies.end(), name) != this->validEnemies.end();
 }
 
+void LevelManager::removeObject(Object * object)
+{
+	IEntity* ent = dynamic_cast<IEntity*>(object);
+	
+	if (ent) {
+		for (auto it = this->Entities.begin(); it != this->Entities.end(); it++) {
+			if ((*it)->id == ent->id){
+				std::cout << "Removed " << *it << " element!" << std::endl;
+
+				this->Entities.erase(it);
+				delete object;
+				return;
+			}
+		}
+	}
+}
 
