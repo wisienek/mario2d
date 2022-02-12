@@ -8,6 +8,7 @@ class IEntity : public Object
 {
 protected:
 	// basic properties
+	bool invincible = false;
 	short int hp = 3;
 
 	bool isMoving = false; // is Entity moving?

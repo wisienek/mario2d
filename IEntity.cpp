@@ -39,7 +39,7 @@ FloatRect IEntity::bounds()
 
 void IEntity::resolveColision()
 {
-	if (canCollide == false) return;
+	if (this->canCollide == false) return;
 	bool goBack = false;
 
 	std::vector<Object*> objects = Game::getInstance()->getObjects();
@@ -55,15 +55,16 @@ void IEntity::resolveColision()
 		Object *obj = dynamic_cast<Object*>(i);
 		if (!obj) continue;
 
-		if (obj->name() != "Mario") {
+		if (obj->name() != "Mario" && obj->name() != "Coin") {
 			// ignore if can't collide
 			if (!obj->isCollidable()) continue;
-
-			// ignore if not collectable
-			if (obj->isCollectable()) continue;
 		}
 
 		std::string direction = this->collisionDirection(obj);
+		if (obj->name() == "Coin" && direction != "") {
+			obj->die();
+			continue;
+		}
 
 		//std::cout << "Direction: " << direction << std::endl;
 
