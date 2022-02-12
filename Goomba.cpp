@@ -23,6 +23,8 @@ void Goomba::die()
 
 	Game *game = Game::getInstance();
 	game->addPoints(100);
+
+	game->getSoundManager()->goombadead();
 }
 
 void Goomba::animate(float deltaTime)
@@ -36,9 +38,6 @@ void Goomba::animate(float deltaTime)
 
 void Goomba::update()
 {
-	if (this->isAlive == false) {
-		std::cout << "DEAD!" << std::endl;
-	}
 	sf::Vector2f movement{ 
 		this->facingRight ? 
 			0.6f : -0.6f, 

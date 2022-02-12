@@ -21,6 +21,7 @@ private:
 	void init(float X, float Y);
 public:
 	Goomba(float x=0, float y=0);
+	const static unsigned short int killPoints = 100;
 
 	virtual std::string name() { return "Goomba"; };
 
