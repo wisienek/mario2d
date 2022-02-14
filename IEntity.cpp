@@ -41,6 +41,7 @@ void IEntity::resolveColision()
 {
 	if (this->canCollide == false) return;
 	bool goBack = false;
+	bool shouldReturn = false;
 
 	std::vector<Object*> objects = Game::getInstance()->getObjects();
 	std::vector<IEntity*> entities = Game::getInstance()->getEntities();
@@ -54,6 +55,11 @@ void IEntity::resolveColision()
 	for (auto& i : objects) {
 		Object *obj = dynamic_cast<Object*>(i);
 		if (!obj) continue;
+
+		if (obj->id == this->id) continue;
+
+		if(this->walkingOn != nullptr)
+			if (this->walkingOn->id == obj->id) continue;
 
 		if (obj->name() != "Mario" && obj->name() != "Coin") {
 			// ignore if can't collide
@@ -71,12 +77,17 @@ void IEntity::resolveColision()
 		if (direction == "") continue;
 
 		if (direction == "TOP") {
+
+			if (obj->isWalkable())
+				this->walkingOn = obj;
+
+
 			if (this->jumping == -1)
 				this->jumping = 0;
-
-			if(obj->isWalkable())
-				this->walkingOn = obj;
 		}
+
+		if (direction != "TOP")
+			shouldReturn = true;
 
 		if (direction == "BOTTOM" && this->jumping == 1) {
 			this->jumping = -1;
@@ -106,17 +117,18 @@ void IEntity::resolveColision()
 	if (goBack == false) {
 		if (!withinBounds) {
 			goBack = true;
-			this->walkingOn = 0;
+			shouldReturn = true;
+			this->walkingOn = nullptr;
 		}
 		// stop falling
 		if (this->jumping == -1 && bounds.top + bounds.height >= boundsH)
 			this->jumping = 0;
 	}
 
-	// std::cout << "Colided: " << goBack << std::endl;
+	// if(goBack) std::cout << "Colided: " << goBack << " DT: " << this->dt << " " << this->name() << std::endl;
 
 	if (goBack) {
-		if (this->name() == "Goomba") {
+		if (this->name() == "Goomba" && shouldReturn) {
 			this->facingRight = !this->facingRight;
 		}
 
