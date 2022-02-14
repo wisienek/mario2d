@@ -22,14 +22,14 @@ LevelManager* LevelManager::getInstance() {
 	return manager;
 }
 
-void LevelManager::load(int level)
+void LevelManager::load(int level = 0)
 {
 	Game* game = Game::getInstance();
 	sf::VideoMode vm = game->getVideoMode();
 
 	this->initWalls();
 
-	std::ifstream i("./levels/level1.json");
+	std::ifstream i("./levels/level" + std::to_string(level) + ".json");
 	json j;
 	i >> j;
 	

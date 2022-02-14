@@ -5,7 +5,6 @@
 #include "Mario.h"
 #include "Object.h"
 #include "BorderBlock.h"
-//#include "LevelManager.h"
 
 // namespace SFML
 using namespace sf;
@@ -97,7 +96,10 @@ void Game::initBlocks()
 
 void Game::showEndingScreen()
 {
-	this->endingText.setString("GAME OVER!\nPoints:   " + this->points);
+	std::string textToDisplay = "GAME OVER!\nPoints:   " + std::to_string(this->points);
+	this->endingText.setString(textToDisplay);
+
+	// std::cout << "Ending text: " << this->endingText.getString().toAnsiString() << std::endl;
 
 	this->window->draw(this->endingText);
 	this->window->display();
@@ -107,10 +109,10 @@ void Game::showEndingScreen()
 void Game::update()
 {
 	this->updateEvents();
-	this->updateText();
 
 	if (this->isGameOver()) return;
 
+	this->updateText();
 	this->updateTime();
 	this->updateEntities();
 }
@@ -226,6 +228,6 @@ void Game::addPoints(long _points)
 
 	if (maxPoints != 0 && this->points >= maxPoints) {
 		this->getSoundManager()->gameover();
-		this->state = false;
+		this->setGameOver();
 	}
 }
